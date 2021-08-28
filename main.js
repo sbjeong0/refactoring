@@ -12,7 +12,7 @@ function statement(invoice, plays) {
 
 function enrichPerformance(aPerformance) {
   const result = Object.assign({}, aPerformance);
-  result.play = playFor(result); // 중간 데이터에 연극 정보를 저장
+  result.play = playFor(result);
   result.amount = amountFor(result);
   result.volumeCredits = volumeCreditsFor(result);
   return result;
@@ -32,12 +32,10 @@ function renderPlainText(data, plays) {
 }
 
 function totalAmount(data) {
-  // for 반복문을 파이프라인으로 바꿈
   return data.performances.reduce((total, p) => total + p.amount, 0);
 }
 
 function totalVolumeCredits(data) {
-  // for 반복문을 파이프라인으로 바꿈
   return data.performances.reduce((total, p) => total + p.volumeCredits, 0);
 }
 
@@ -64,7 +62,6 @@ function playFor(aPerformance) {
 
 function amountFor(aPerformance) {
   let result = 0;
-  // play를 playFor() 호출로 변경
   switch (aPerformance.play.type) {
     case "tragedy":
       result = 40000;
@@ -80,7 +77,6 @@ function amountFor(aPerformance) {
       result += 300 * aPerformance.audience;
       break;
     default:
-      // play를 playFor() 호출로 변경
       throw new Error(`알 수 없는 장르: ${aPerformance.play.type}`);
   }
   return result;
