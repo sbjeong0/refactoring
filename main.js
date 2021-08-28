@@ -2,14 +2,23 @@ var invoice = require("./invoices.json");
 var plays = require("./plays.json");
 
 function statement(invoice, plays) {
-  return renderPlainText(invoice, plays);
+  const statementData = {};
+  statementData.customer = invoice.customer;
+  statementData.performances = invoice.performances.map(enrichPerformance);
+  return renderPlainText(statementData, plays);
 }
 
-function renderPlainText(invoice, plays) {
-  let result = `청구 내역(고객명: ${invoice.customer})\n`;
+function enrichPerformance(aPerformance) {
+  const result = Object.assign({}, aPerformance);
+  result.play = playFor(result); // 중간 데이터에 연극 정보를 저장
+  return result;
+}
 
-  for (let perf of invoice.performances) {
-    result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience}석)\n`;
+function renderPlainText(data, plays) {
+  let result = `청구 내역(고객명: ${data.customer})\n`;
+
+  for (let perf of data.performances) {
+    result += ` ${perf.play.name}: ${usd(amountFor(perf))} (${perf.audience}석)\n`;
   }
 
   result += `총액: ${usd(totalAmount())}\n`;
