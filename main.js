@@ -5,6 +5,8 @@ function statement(invoice, plays) {
   const statementData = {};
   statementData.customer = invoice.customer;
   statementData.performances = invoice.performances.map(enrichPerformance);
+  statementData.totalAmount = totalAmount(statementData);
+  statementData.totalVolumeCredits = totalVolumeCredits(statementData);
   return renderPlainText(statementData, plays);
 }
 
@@ -12,6 +14,7 @@ function enrichPerformance(aPerformance) {
   const result = Object.assign({}, aPerformance);
   result.play = playFor(result); // 중간 데이터에 연극 정보를 저장
   result.amount = amountFor(result);
+  result.volumeCredits = volumeCreditsFor(result);
   return result;
 }
 
@@ -22,26 +25,20 @@ function renderPlainText(data, plays) {
     result += ` ${perf.play.name}: ${usd(perf.amount)} (${perf.audience}석)\n`;
   }
 
-  result += `총액: ${usd(totalAmount(data))}\n`;
-  result += `적립 포인트 ${totalVolumeCredits(data)}점\n`;
+  result += `총액: ${usd(data.totalAmount)}\n`;
+  result += `적립 포인트 ${data.totalVolumeCredits}점\n`;
 
   return result;
 }
 
 function totalAmount(data) {
-  let result = 0;
-  for (let perf of data.performances) {
-    result += perf.amount;
-  }
-  return result;
+  // for 반복문을 파이프라인으로 바꿈
+  return data.performances.reduce((total, p) => total + p.amount, 0);
 }
 
 function totalVolumeCredits(data) {
-  let result = 0;
-  for (let perf of data.performances) {
-    result += volumeCreditsFor(perf);
-  }
-  return result;
+  // for 반복문을 파이프라인으로 바꿈
+  return data.performances.reduce((total, p) => total + p.volumeCredits, 0);
 }
 
 function usd(aNumber) {
