@@ -32,11 +32,10 @@ function playFor(aPerformance) {
   return plays[aPerformance.playID];
 }
 
-// 더 명확한 이름으로 변경
 function amountFor(aPerformance, play) {
-  let result = 0; // <- 더 명확한 이름으로 변경
-
-  switch (play.type) {
+  let result = 0;
+  // play를 playFor() 호출로 변경
+  switch (playFor(aPerformance).type) {
     case "tragedy":
       result = 40000;
       if (aPerformance.audience > 30) {
@@ -51,7 +50,8 @@ function amountFor(aPerformance, play) {
       result += 300 * aPerformance.audience;
       break;
     default:
-      throw new Error(`알 수 없는 장르: ${play.type}`);
+      // play를 playFor() 호출로 변경
+      throw new Error(`알 수 없는 장르: ${playFor(aPerformance).type}`);
   }
   return result;
 }
