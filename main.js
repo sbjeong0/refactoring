@@ -11,14 +11,18 @@ function statement(invoice, plays) {
     totalAmount += amountFor(perf);
   }
 
+  let volumeCredits = totalVolumeCredits();
+  result += `총액: ${usd(totalAmount)}\n`;
+  result += `적립 포인트 ${volumeCredits}점\n`;
+  return result;
+}
+
+function totalVolumeCredits() {
   let volumeCredits = 0;
   for (let perf of invoice.performances) {
     volumeCredits += volumeCreditsFor(perf);
   }
-
-  result += `총액: ${usd(totalAmount)}\n`;
-  result += `적립 포인트 ${volumeCredits}점\n`;
-  return result;
+  return volumeCredits;
 }
 
 function usd(aNumber) {
