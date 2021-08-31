@@ -11,12 +11,23 @@ exports.createStatementData = function createStatementData(invoice, plays) {
 };
 
 function enrichPerformance(aPerformance) {
-  const calulator = new PerformanceCalculator(aPerformance, playFor(aPerformance));
+  const calulator = createPerformanceCalculator(aPerformance, playFor(aPerformance));
   const result = Object.assign({}, aPerformance);
   result.play = playFor(result);
   result.amount = calulator.amount;
   result.volumeCredits = calulator.volumeCredits;
   return result;
+}
+
+function createPerformanceCalculator(aPerformance, aPlay) {
+  switch (aPlay.type) {
+    case "tragedy":
+      return new TragedyCalculator(aPerformance, aPlay);
+    case "comedy":
+      return new ComedyCalculator(aPerformance, aPlay);
+    default:
+      throw new Error(`알 수 없는 장르: ${this.play.type}`);
+  }
 }
 
 class PerformanceCalculator {
@@ -28,22 +39,12 @@ class PerformanceCalculator {
     let result = 0;
     switch (this.play.type) {
       case "tragedy":
-        result = 40000;
-        if (this.performance.audience > 30) {
-          result += 1000 * (this.performance.audience - 30);
-        }
-        break;
+        throw "오류 발생"; // <- 비극 공연료는 TragedyCalculator를 이용하도록 유도
       case "comedy":
-        result = 30000;
-        if (this.performance.audience > 20) {
-          result += 10000 + 500 * (this.performance.audience - 20);
-        }
-        result += 300 * this.performance.audience;
-        break;
+        throw "오류 발생"; // <- 희극 공연료는 TragedyCalculator를 이용하도록 유도
       default:
         throw new Error(`알 수 없는 장르: ${this.play.type}`);
     }
-    return result;
   }
   get volumeCredits() {
     let volumeCredits = 0;
@@ -52,6 +53,26 @@ class PerformanceCalculator {
       volumeCredits += Math.floor(this.performance.audience / 5);
     }
     return volumeCredits;
+  }
+}
+
+class TragedyCalculator extends PerformanceCalculator {
+  get amount() {
+    let result = 40000;
+    if (this.performance.audience > 30) {
+      result += 1000 * (this.performance.audience - 30);
+    }
+    return result;
+  }
+}
+class ComedyCalculator extends PerformanceCalculator {
+  get amount() {
+    let result = 30000;
+    if (this.performance.audience > 20) {
+      result += 10000 + 500 * (this.performance.audience - 20);
+    }
+    result += 300 * this.performance.audience;
+    return result;
   }
 }
 
