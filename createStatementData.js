@@ -30,29 +30,26 @@ function createPerformanceCalculator(aPerformance, aPlay) {
   }
 }
 
+function totalAmount(data) {
+  return data.performances.reduce((total, p) => total + p.amount, 0);
+}
+function totalVolumeCredits(data) {
+  return data.performances.reduce((total, p) => total + p.volumeCredits, 0);
+}
+function playFor(aPerformance) {
+  return plays[aPerformance.playID];
+}
+
 class PerformanceCalculator {
   constructor(aPerformance, aPlay) {
     this.performance = aPerformance;
     this.play = aPlay;
   }
   get amount() {
-    let result = 0;
-    switch (this.play.type) {
-      case "tragedy":
-        throw "오류 발생"; // <- 비극 공연료는 TragedyCalculator를 이용하도록 유도
-      case "comedy":
-        throw "오류 발생"; // <- 희극 공연료는 TragedyCalculator를 이용하도록 유도
-      default:
-        throw new Error(`알 수 없는 장르: ${this.play.type}`);
-    }
+    throw new Error(`서브클래스에서 처리하도록 설계되었습니다.`);
   }
   get volumeCredits() {
-    let volumeCredits = 0;
-    volumeCredits += Math.max(this.performance.audience - 30, 0);
-    if ("comedy" === this.play.type) {
-      volumeCredits += Math.floor(this.performance.audience / 5);
-    }
-    return volumeCredits;
+    return Math.max(this.performance.audience - 30, 0);
   }
 }
 
@@ -74,14 +71,7 @@ class ComedyCalculator extends PerformanceCalculator {
     result += 300 * this.performance.audience;
     return result;
   }
-}
-
-function totalAmount(data) {
-  return data.performances.reduce((total, p) => total + p.amount, 0);
-}
-function totalVolumeCredits(data) {
-  return data.performances.reduce((total, p) => total + p.volumeCredits, 0);
-}
-function playFor(aPerformance) {
-  return plays[aPerformance.playID];
+  get volumeCredits() {
+    return super.volumeCredits + Math.floor(this.performance.audience / 5);
+  }
 }
